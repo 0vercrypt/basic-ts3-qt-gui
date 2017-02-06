@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <basicdialog.h>
 #include "teamspeak/public_errors.h"
 #include "teamspeak/public_errors_rare.h"
 #include "teamspeak/public_definitions.h"
@@ -48,14 +49,14 @@ const char* ts3plugin_name() {
 #ifdef _WIN32
 	static char* result = NULL;
 	if(!result) {
-		const wchar_t* name = L"Minimal Plugin";
+		const wchar_t* name = L"Basic TS3 QT GUI";
 		if(wcharToUtf8(name, &result) == -1) {
-			result = "Minimal Plugin";
+			result = "Basic TS3 QT GUI";
 		}
 	}
 	return result;
 #else
-	return "Minimal Plugin";
+	return "Basic TS3 QT GUI";
 #endif
 }
 
@@ -72,7 +73,7 @@ const char* ts3plugin_author() {
 }
 
 const char* ts3plugin_description() {
-	return "This plugin is built with the minimum of source code needed to code a TS3 client plugin.";
+	return "This plugin shows the use of a QT GUI as configuration window.";
 }
 
 void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
@@ -87,7 +88,16 @@ void ts3plugin_shutdown() {
 }
 
 int ts3plugin_offersConfigure() {
-	return PLUGIN_OFFERS_NO_CONFIGURE;
+	return PLUGIN_OFFERS_CONFIGURE_QT_THREAD;
+}
+
+void ts3plugin_configure(void* handle, void* qParentWidget)
+{
+	Q_UNUSED(handle);
+
+	basicdialog* config = new basicdialog((QWidget*)qParentWidget);
+	config->setAttribute(Qt::WA_DeleteOnClose);
+	config->exec();
 }
 
 const char* ts3plugin_commandKeyword() {
